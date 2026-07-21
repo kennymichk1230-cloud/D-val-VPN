@@ -1,0 +1,6 @@
+{
+  "name": "Dval Wireless VPN",
+  "description": "A high-performance WireGuard-powered VPN client with intuitive server selection and easy configuration import.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

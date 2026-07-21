@@ -1,0 +1,21 @@
+# Handle line endings automatically for files detected as text and leave all files detected as binary untouched.
+* text=auto
+
+# Ensure bash scripts use LF line endings so they work on Unix/Linux
+gradlew text eol=lf
+*.sh text eol=lf
+
+# Ensure batch files use CRLF line endings so they work on Windows
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Denote all files that are truly binary and should not be modified
+*.jar binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.keystore binary
+*.jks binary
