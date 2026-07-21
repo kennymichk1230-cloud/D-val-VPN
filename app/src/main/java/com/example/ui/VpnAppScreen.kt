@@ -55,7 +55,7 @@ import java.io.InputStream
 fun VpnAppScreen(
     viewModel: VpnViewModel,
     modifier: Modifier = Modifier,
-    onRequestVpnPermission: () -> Unit
+    onRequestVpnPermission: (() -> Unit) -> Unit
 ) {
     var selectedTab by remember { mutableStateOf(0) }
     val context = LocalContext.current
@@ -280,7 +280,7 @@ fun VpnAppScreen(
 @Composable
 fun DashboardTab(
     viewModel: VpnViewModel,
-    onRequestVpnPermission: () -> Unit,
+    onRequestVpnPermission: (() -> Unit) -> Unit,
     onNavigateToServers: () -> Unit
 ) {
     val selectedProfile by viewModel.selectedProfile.collectAsStateWithLifecycle()
@@ -463,8 +463,13 @@ fun DashboardTab(
 
                 Surface(
                     onClick = {
-                        onRequestVpnPermission()
-                        viewModel.toggleConnection()
+                        if (isConnected) {
+                            viewModel.toggleConnection()
+                        } else {
+                            onRequestVpnPermission {
+                                viewModel.toggleConnection()
+                            }
+                        }
                     },
                     modifier = Modifier
                         .size(160.dp)

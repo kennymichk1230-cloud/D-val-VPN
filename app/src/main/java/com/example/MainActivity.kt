@@ -18,14 +18,18 @@ import com.example.ui.theme.MyApplicationTheme
 class MainActivity : ComponentActivity() {
     private val viewModel: VpnViewModel by viewModels()
 
+    private var pendingPermissionCallback: (() -> Unit)? = null
+
     private val vpnPrepareLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == RESULT_OK) {
-            Toast.makeText(this, "VPN permission granted! Tap connect again.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "VPN permission granted! Connecting...", Toast.LENGTH_SHORT).show()
+            pendingPermissionCallback?.invoke()
         } else {
             Toast.makeText(this, "VPN permission denied. Cannot establish tunnel.", Toast.LENGTH_LONG).show()
         }
+        pendingPermissionCallback = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,18 +40,17 @@ class MainActivity : ComponentActivity() {
                 VpnAppScreen(
                     viewModel = viewModel,
                     modifier = Modifier.fillMaxSize(),
-                    onRequestVpnPermission = {
-                        prepareVpn()
+                    onRequestVpnPermission = { onGranted ->
+                        val intent = VpnService.prepare(this)
+                        if (intent != null) {
+                            pendingPermissionCallback = onGranted
+                            vpnPrepareLauncher.launch(intent)
+                        } else {
+                            onGranted()
+                        }
                     }
                 )
             }
-        }
-    }
-
-    private fun prepareVpn() {
-        val intent = VpnService.prepare(this)
-        if (intent != null) {
-            vpnPrepareLauncher.launch(intent)
         }
     }
 }
